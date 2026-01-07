@@ -1,152 +1,168 @@
-# 📋 TODO List
+# TODO List
 
-**Last Updated:** 2025-01-07
-
----
-
-## 🔥 Priority 1 - Phase C2 (v5.1) - AKTYWNE
-
-### Full GPU Migration
-- [ ] **Audit legacy CPU code**
-  - [ ] Zidentyfikować wszystkie funkcje CPU physics
-  - [ ] Zmapować które są używane, które legacy
-  - [ ] Oszacować effort migracji
-  
-- [ ] **Migracja physics do GPU**
-  - [ ] updateParticles() → GPU compute shader
-  - [ ] Collision detection → GPU
-  - [ ] Spatial hash → GPU (opcjonalnie)
-  - [ ] Force calculations → GPU
-  
-- [ ] **Cleanup legacy code**
-  - [ ] Usunąć CPU updateParticles()
-  - [ ] Usunąć nieużywane CPU buffers
-  - [ ] Wyczyścić komentarze legacy
-  
-- [ ] **Testing & Benchmarking**
-  - [ ] Test 1,000 particles
-  - [ ] Test 10,000 particles
-  - [ ] Test 100,000 particles
-  - [ ] Porównanie CPU vs GPU performance
-  - [ ] Memory leak testing
-
-**Deadline:** 2 tygodnie (do ~2025-01-21)  
-**Assignee:** Claude + Michal
+> Planned features and improvements for Petrie Dish
 
 ---
 
-## 📌 Priority 2 - Phase C3 (v5.2) - PLANOWANE
+## 🔥 Priority 1 - v5.1-C2 (Full GPU Migration)
 
-### Advanced Features
-- [ ] **Extended Color System**
-  - [ ] Zwiększyć z 16 do 32 kolorów
-  - [ ] Redesign UI matrix editor
-  - [ ] Optimize matrix storage
-  
-- [ ] **Export/Import System**
-  - [ ] Export configuration jako JSON
-  - [ ] Import configuration
-  - [ ] Preset library (predefiniowane matrycie)
-  - [ ] Share link generation
-  
-- [ ] **Shader Optimization**
-  - [ ] Profile compute shaders
-  - [ ] Optymalizacja workgroup size
-  - [ ] Reduce GPU memory transfers
-  
-- [ ] **UI Improvements**
-  - [ ] Window snapping (Aero Snap-like)
-  - [ ] Keyboard shortcuts
-  - [ ] Color picker dla particles
-  - [ ] Better tooltips
+**Target:** 2025-01-20
 
-**Deadline:** TBD  
-**Assignee:** TBD
+### Code Cleanup
+- [ ] **Remove legacy CPU physics** (~500 lines)
+  - [ ] Delete `updateParticles()` CPU function
+  - [ ] Remove CPU collision detection
+  - [ ] Clean up particle update loops
+- [ ] **Audit codebase** for GPU migration completeness
+  - [ ] Identify all CPU physics references
+  - [ ] Document GPU equivalents
+  - [ ] Create migration checklist
 
----
+### GPU Optimization
+- [ ] **Optimize compute shader dispatch**
+  - [ ] Benchmark workgroup sizes (current: 256)
+  - [ ] Test different buffer layouts
+  - [ ] Profile GPU memory bandwidth
+- [ ] **Improve buffer synchronization**
+  - [ ] Minimize CPU-GPU transfers
+  - [ ] Batch buffer updates
+  - [ ] Implement dirty flag system
+- [ ] **Shader optimization**
+  - [ ] Review WGSL code for efficiency
+  - [ ] Add shader compilation caching
+  - [ ] Optimize uniform buffer updates
 
-## 💡 Ideas - Backlog
-
-### Recording & Playback
-- [ ] Record simulation state
-- [ ] Playback recorded simulation
-- [ ] Timeline scrubbing
-- [ ] Export as video/GIF
-
-### Visualization
-- [ ] Heatmap overlay (density visualization)
-- [ ] Velocity field visualization
-- [ ] Energy graph
-- [ ] Particle trails
-
-### Physics Features
-- [ ] Gravity wells
-- [ ] Boundary conditions (wrap/bounce/kill)
-- [ ] Custom force fields
-- [ ] Particle spawning patterns
-
-### Developer Tools
-- [ ] Performance profiler
-- [ ] Shader debugger
-- [ ] Memory monitor
-- [ ] GPU utilization graph
-
-### Multi-Platform
-- [ ] Mobile touch support
-- [ ] Responsive UI
-- [ ] PWA support
-- [ ] Offline mode
+### Testing & Validation
+- [ ] **Performance benchmarking**
+  - [ ] CPU vs GPU comparison (1k, 10k, 100k particles)
+  - [ ] Frame time profiling
+  - [ ] Memory usage tracking
+- [ ] **WebGL fallback testing**
+  - [ ] Test all features with WebGL path
+  - [ ] Fix rendering artifacts
+  - [ ] Ensure feature parity
 
 ---
 
-## 🐛 Known Bugs to Fix
+## 📌 Priority 2 - v5.2 (Advanced Features)
 
-### Critical
-- None currently
-
-### Medium
-- [ ] WebGL fallback not fully tested
-- [ ] Canvas resize może powodować flash
-- [ ] Text cache może rosnąć przy dynamicznych labelach
-
-### Low Priority
-- [ ] Drag window czasem "skacze" przy szybkim ruchu
-- [ ] Stats nie aktualizują się w pause
-- [ ] Console spam przy GPU errors
-
----
-
-## 🧹 Technical Debt
-
-- [ ] Refactor GPUBufferManager (zbyt duża klasa)
-- [ ] Split main HTML na moduły (jeśli będzie potrzeba)
-- [ ] Add TypeScript definitions (opcjonalnie)
-- [ ] Improve error handling
-- [ ] Add unit tests (jeśli projekt urośnie)
-- [ ] Documentation (inline comments w key functions)
-
----
-
-## 📊 Metrics & Goals
-
-### Performance Targets
-- **FPS:** 60 @ 10,000 particles (GPU)
-- **Memory:** < 100 MB @ 50,000 particles
-- **Startup:** < 2s to first frame
-
-### Code Quality
-- **Lines of Code:** Keep under 5,000 (current: ~4,400)
-- **Functions:** Prefer small, focused functions
-- **Comments:** All major sections documented
+**Target:** 2025-02-15
 
 ### User Experience
-- **Load Time:** < 1s (single file HTML)
-- **Responsive:** Work on 1920×1080 to 1280×720
-- **Intuitive:** No tutorial needed for basic use
+- [ ] **Simulation presets**
+  - [ ] "Chaos" mode
+  - [ ] "Harmony" mode
+  - [ ] "Solar system" simulation
+  - [ ] Custom preset editor
+- [ ] **Export/Import system**
+  - [ ] Export configuration to JSON
+  - [ ] Import saved states
+  - [ ] Share preset URLs
+- [ ] **Replay system**
+  - [ ] Record simulation states
+  - [ ] Playback controls
+  - [ ] Export to video (WebCodecs)
+
+### Visualization
+- [ ] **Advanced statistics graphs**
+  - [ ] Real-time energy plot
+  - [ ] Particle distribution histogram
+  - [ ] Interaction heatmap
+- [ ] **Visual effects**
+  - [ ] Particle trails (GPU-based)
+  - [ ] Glow effects
+  - [ ] Collision sparks
 
 ---
 
-**Notes:**
-- Items marked with [ ] are not started
-- Items marked with [x] are completed
-- Priority może się zmieniać based on feedback
+## 💡 Priority 3 - Future Ideas
+
+### Performance
+- [ ] **Multi-pass compute shaders**
+  - [ ] Separate position update and collision
+  - [ ] Parallel spatial hash construction
+  - [ ] GPU-side culling
+- [ ] **WebAssembly integration**
+  - [ ] WASM for heavy CPU tasks
+  - [ ] Benchmark vs pure JS
+
+### Features
+- [ ] **Advanced physics**
+  - [ ] Gravity wells
+  - [ ] Magnetic fields
+  - [ ] Particle bonds
+  - [ ] Quantum effects simulation
+- [ ] **3D mode**
+  - [ ] WebGPU 3D rendering
+  - [ ] Camera controls
+  - [ ] Z-axis physics
+- [ ] **Machine learning**
+  - [ ] Pattern recognition
+  - [ ] Emergent behavior analysis
+  - [ ] Auto-optimization
+
+### UI/UX
+- [ ] **Mobile support**
+  - [ ] Touch controls
+  - [ ] Responsive UI
+  - [ ] Performance optimizations
+- [ ] **Themes**
+  - [ ] Dark/light mode
+  - [ ] Custom color schemes
+  - [ ] Accessibility options
+
+---
+
+## 🐛 Bug Fixes (Ongoing)
+
+- [ ] Fix WebGL fallback artifacts
+- [ ] Handle GPU device loss gracefully
+- [ ] Improve error messages
+- [ ] Add input validation
+- [ ] Memory leak detection
+
+---
+
+## 📚 Documentation (Ongoing)
+
+- [ ] **Code documentation**
+  - [ ] JSDoc comments for all functions
+  - [ ] Architecture diagrams
+  - [ ] Performance profiling guide
+- [ ] **User guide**
+  - [ ] Getting started tutorial
+  - [ ] Feature walkthrough
+  - [ ] Troubleshooting guide
+- [ ] **API documentation**
+  - [ ] Particle system API
+  - [ ] GPU compute API
+  - [ ] UI component library
+
+---
+
+## 🔄 Refactoring (Continuous)
+
+- [ ] **Code organization**
+  - [x] Split monolithic file into modules
+  - [ ] Improve module boundaries
+  - [ ] Reduce coupling
+- [ ] **Type safety**
+  - [ ] Consider TypeScript migration
+  - [ ] Add JSDoc types
+  - [ ] Runtime type checking
+- [ ] **Testing**
+  - [ ] Unit tests for core functions
+  - [ ] Integration tests
+  - [ ] Performance regression tests
+
+---
+
+**Legend:**
+- 🔥 Critical / High Priority
+- 📌 Important / Medium Priority
+- 💡 Nice to have / Low Priority
+- 🐛 Bug fix
+- 📚 Documentation
+- 🔄 Refactoring
+
+**Last Updated:** 2025-01-07

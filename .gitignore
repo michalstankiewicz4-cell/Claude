@@ -33,7 +33,9 @@ experiments/temp-*
 *-notes.txt
 
 # Build artifacts (jeśli kiedyś będzie build process)
-dist/
+# dist/ - ENABLED: We keep compiled versions here
+dist/temp-*
+dist/*.tmp
 build/
 out/
 

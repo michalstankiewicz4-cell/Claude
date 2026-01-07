@@ -1,142 +1,119 @@
-# 🧫 Petrie Dish - WebGPU Particle Simulator
+# 🧫 Petrie Dish - WebGPU Physics Simulator
 
-**Zaawansowany symulator cząstek z physics engine na GPU i 16-kolorową matrią interakcji**
+> High-performance particle physics simulation with GPU-accelerated compute and real-time interaction matrix
 
-## 🚀 Aktualna Wersja: v5.0-C1
+[![Version](https://img.shields.io/badge/version-5.0--C1-blue.svg)](CHANGELOG.md)
+[![WebGPU](https://img.shields.io/badge/WebGPU-enabled-green.svg)](https://gpuweb.github.io/gpuweb/)
+[![License](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
 
-**Status:** ✅ Stable  
-**Data:** 2025-01-07  
-**Features:** WebGPU Zero-Copy Rendering, GPU Buffer Manager, UI Optimization
+## 📋 Overview
 
----
+Petrie Dish is an advanced particle physics simulator featuring:
+- **WebGPU compute shaders** for GPU-accelerated physics
+- **16-color interaction matrix** with customizable attraction/repulsion
+- **Real-time UI system** with draggable windows and live statistics
+- **Zero-copy rendering** for optimal performance
+- **Spatial hash optimization** for efficient collision detection
 
-## 📂 Struktura Projektu
+## 🚀 Current Version
+
+**v5.0-C1 (Phase C1)** - WebGPU Zero-Copy Rendering
+- ✅ GPU Buffer Manager implemented
+- ✅ Compute shaders for physics calculations
+- ✅ Text measurement cache (2-5× UI speedup)
+- ⚠️ Legacy CPU code still present (removal planned for C2)
+
+## 📁 Project Structure
 
 ```
 Akcelerator/
-├── stable/                          # 📦 Stabilne wersje produkcyjne
-│   └── petrie-dish-v5.0-C1.html    # Aktualna stable version
-├── dev/                             # 🔧 Wersje rozwojowe
-│   └── petrie-dish-v5.1-C2-dev.html # Następna wersja (Full GPU)
-├── experiments/                     # 🧪 Eksperymenty i prototypy
-├── docs/                            # 📚 Dokumentacja
-├── CHANGELOG.md                     # Historia zmian
-├── TODO.md                          # Lista zadań
-└── KNOWN_ISSUES.md                  # Znane problemy
+├── src/
+│   ├── core/           # Core initialization, settings, constants
+│   ├── gpu/            # WebGPU: buffers, shaders, compute
+│   ├── ui/             # UI system: windows, taskbar, renderer
+│   ├── physics/        # Particle physics, spatial hash
+│   ├── rendering/      # WebGL fallback, camera
+│   └── utils/          # Helper functions, caches
+├── dist/               # Compiled single-file versions
+├── docs/               # Documentation
+├── README.md           # This file
+├── CHANGELOG.md        # Version history
+├── TODO.md             # Planned features
+└── KNOWN_ISSUES.md     # Bug tracker
 ```
 
----
+## 🎯 Getting Started
 
-## 🎯 Roadmap
+### Requirements
+- Modern browser with WebGPU support (Chrome 113+, Edge 113+)
+- GPU with compute shader support
 
-### ✅ Phase C1 (v5.0) - COMPLETED
-- WebGPU detection & initialization
-- GPU Buffer Manager
-- Zero-copy rendering pipeline
-- Text measurement cache (2-5× UI speedup)
-- Matrix rendering optimization
+### Quick Start
+```bash
+# Open the single-file version
+open dist/petrie-dish-v5.0-C1.html
 
-### 🔄 Phase C2 (v5.1) - IN PROGRESS
-**Goal:** Full GPU Migration - 100% compute na GPU
+# Or serve locally for development
+python -m http.server 8000
+# Navigate to http://localhost:8000
+```
 
-**Plan:**
-- [ ] Audit & identyfikacja legacy CPU code
-- [ ] Migracja physics do GPU compute shaders
-- [ ] Usunięcie updateParticles() CPU function
-- [ ] Pipeline optimization
-- [ ] Benchmarking
+## 🔧 Development
 
-**Timeline:** 1-2 tygodnie
-
-### 📋 Phase C3 (v5.2) - PLANNED
-- Advanced shader optimization
-- Extended color matrix (32 colors?)
-- Export/Import configurations
-
----
-
-## 🏗️ Architektura
-
-### Główne Komponenty
-
-**1. WebGPU Physics Engine**
-- Compute shaders dla fizyki
-- GPU Buffer Manager (position, velocity, mass, color)
-- Zero-copy rendering pipeline
-
-**2. UI System**
-- BaseWindow class (draggable windows)
-- Taskbar (Windows-style)
-- Stats monitoring
-- Matrix editor (16×16 interaction grid)
-
-**3. Particle System**
-- 16 typów cząstek
-- Konfigurowalna matryca interakcji
-- Spatial hash optimization
-- GPU rendering
-
----
-
-## 🔧 Tech Stack
-
-- **Rendering:** WebGPU (fallback: WebGL)
-- **Physics:** GPU Compute Shaders
-- **UI:** Canvas 2D (optimized)
-- **Language:** Pure JavaScript (ES6+)
-- **Format:** Jednoplikowy HTML (easy deployment)
-
----
-
-## 🚦 Jak Używać
-
-1. Otwórz `stable/petrie-dish-v5.0-C1.html` w przeglądarce
-2. Wymagania:
-   - Chrome 113+ lub Edge 113+ (dla WebGPU)
-   - Fallback na CPU dla starszych przeglądarek
-
----
-
-## 📝 System Wersjonowania
-
+### Version Naming Convention
 ```
 Format: vMAJOR.MINOR-PHASE[-SUFFIX]
 
 Examples:
-v5.0-C1          ← Stable release
-v5.1-C2-dev      ← Development version
-v5.1-C2-rc1      ← Release candidate
-v6.0-D1          ← Major version bump
+v5.0-C1          # Current stable
+v5.1-C2-dev      # Development version
+v5.1-C2          # Next stable release
+v6.0-D1          # Major architecture change
 ```
 
-**MAJOR** - Breaking changes, przepisanie architektury  
-**MINOR** - Nowe features, optymalizacje  
-**PHASE** - Fazy rozwoju (A, B, C, D...)  
-**SUFFIX** - dev/beta/rc/hotfix
+### Development Workflow
+1. Create feature branch: `git checkout -b feature/gpu-migration`
+2. Work on modular source in `src/`
+3. Test thoroughly
+4. Build single-file version to `dist/`
+5. Update `CHANGELOG.md`
+6. Merge to main
 
----
+## 📊 Performance
+
+- **Particle limit**: 100,000 particles
+- **Physics**: GPU compute shaders
+- **Rendering**: WebGPU zero-copy (fallback: WebGL)
+- **UI**: Cached text measurements, optimized rendering
+
+## 🛠️ Tech Stack
+
+- **WebGPU** - GPU compute & rendering
+- **WebGL 2.0** - Fallback rendering
+- **Canvas 2D** - UI overlay
+- **Pure JavaScript** - No frameworks
+
+## 📖 Documentation
+
+- [Changelog](CHANGELOG.md) - Version history
+- [TODO](TODO.md) - Planned features
+- [Known Issues](KNOWN_ISSUES.md) - Bug tracker
+- [Architecture](docs/ARCHITECTURE.md) - System design (TODO)
 
 ## 🤝 Contributing
 
-Ten projekt jest obecnie w fazie aktywnego rozwoju.  
-Development workflow:
+This is a personal research project. Suggestions welcome via issues!
 
-1. Branch: `git checkout -b feature/nazwa`
-2. Pracuj na: `dev/petrie-dish-vX.X-XX-dev.html`
-3. Commit: `git commit -m "feat: opis zmiany"`
-4. Merge: po testach → `stable/`
+## 📜 License
 
----
+MIT License - See LICENSE file for details
 
-## 📄 Licencja
+## 🎓 Credits
 
-TBD
+Created by Michał Stankiewicz (@michalstankiewicz4-cell)
+Based on particle physics research and WebGPU exploration
 
 ---
 
-## 👤 Autor
-
-Michal Stankiewicz (michalstankiewicz4-cell)
-
-**Contact:** michalstankiewicz4@gmail.com  
-**GitHub:** https://github.com/michalstankiewicz4-cell/Claude
+**Last Updated:** 2025-01-07  
+**Status:** Active Development (Phase C2 in progress)

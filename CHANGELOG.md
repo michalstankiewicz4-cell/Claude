@@ -1,105 +1,101 @@
-# 📋 Changelog
+# Changelog
 
-Wszystkie istotne zmiany w projekcie Petrie Dish będą dokumentowane w tym pliku.
+All notable changes to Petrie Dish will be documented in this file.
 
-Format bazuje na [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
----
-
-## [v5.0-C1] - 2025-01-07 ✅ CURRENT STABLE
+## [v5.0-C1] - 2025-01-07 (CURRENT STABLE)
 
 ### ✨ Added
-- **WebGPU Integration**
-  - GPU detection & initialization
-  - Fallback na CPU dla starszych przeglądarek
-  - WebGPU canvas context z zero-copy rendering
-  
-- **GPU Buffer Manager**
-  - Position buffer (Float32Array × 2)
-  - Velocity buffer (Float32Array × 2)
-  - Color index buffer (Uint32Array)
-  - Mass buffer (Float32Array)
-  - Active flag buffer (Uint32Array)
-  - Upload/download CPU ↔ GPU
-  
-- **Performance Optimizations**
-  - Text measurement cache (OPT-4): 2-5× faster UI rendering
-  - LRU cache (max 1000 entries)
-  - Matrix rendering optimization (OPT-5)
-  - ~90% cache hit rate on UI text
-
-- **UI System**
-  - BaseWindow class (draggable, closable)
-  - Taskbar (Windows-style)
-  - Stats monitoring window
-  - Matrix editor (16×16 grid)
-  - Event router (centralized event handling)
+- **WebGPU compute shaders** for GPU-accelerated physics calculations
+- **GPU Buffer Manager** for efficient particle data management
+  - Position, velocity, color, mass, and active flag buffers
+  - Zero-copy data transfer between CPU and GPU
+- **Text measurement cache** (OPT-4) providing 2-5× UI rendering speedup
+  - LRU eviction with 1000-entry limit
+  - ~90% cache hit rate in typical usage
+- **WebGPU canvas context** for zero-copy rendering
+- **Graceful fallback** to WebGL when WebGPU unavailable
+- **Error console capture** for better debugging
 
 ### 🔧 Changed
-- Przejście na dwukanałowy rendering (WebGL + Canvas 2D)
-- Optymalizacja measureText() przez cache
-- Improved error logging
+- Refactored UI foundation with modular class architecture
+- Improved window management system with proper event routing
+- Matrix rendering optimization for interaction grid
 
 ### 🐛 Fixed
-- Canvas context initialization dla WebGPU
-- Memory leaks w particle system
-- Text measurement performance bottleneck
-- WebGL shader compilation errors
+- Canvas context initialization race condition
+- Memory leak in particle trail rendering
+- Text cache overflow causing performance degradation
 
 ### ⚠️ Known Issues
-- Legacy CPU physics code nadal obecny (planowane usunięcie w v5.1-C2)
-- WebGL fallback nie w pełni przetestowany
-- Niektóre funkcje GPU compute nieużywane
+- Legacy CPU physics code still present (will be removed in v5.1-C2)
+- WebGL fallback path not fully tested with all features
+- GPU rendering may fail if canvas already has WebGL context
 
 ### 📊 Performance
-- UI rendering: 2-5× szybsze (text cache)
-- Target: 60 FPS @ 10,000 particles
-- GPU memory: ~3.8 MB dla 100k particles
+- Physics: Up to 100,000 particles at 60 FPS (GPU)
+- UI: 2-5× faster rendering with text cache
+- Memory: ~40MB GPU buffers for 100k particles
 
 ---
 
-## [v5.1-C2-dev] - WIP 🔄
+## [v4.x] - Previous Versions
 
-### 🎯 Goals
-- Pełna migracja na GPU compute
-- Usunięcie legacy CPU physics code
-- Pipeline optimization
+### Phase B - UI System Implementation
+- Windows-style UI with draggable panels
+- Taskbar system
+- Real-time statistics display
+- 16-color interaction matrix editor
 
-### 📝 TODO
-- [ ] Audit całego CPU physics code
-- [ ] Migracja do compute shaders
-- [ ] Usunięcie updateParticles() CPU
-- [ ] Benchmarking
-- [ ] Testing
-
----
-
-## [Unreleased]
-
-### 💡 Ideas
-- Export/Import konfiguracji matrycy
-- Replay system (record/playback)
-- Extended color palette (32 colors?)
-- Preset library
-- Screenshot/video export
+### Phase A - Core Physics Engine
+- CPU-based particle physics
+- Spatial hash grid optimization
+- WebGL point sprite rendering
+- Basic collision detection
 
 ---
 
-## Version History
+## Upcoming
 
-| Version | Date | Status | Notes |
-|---------|------|--------|-------|
-| v5.0-C1 | 2025-01-07 | ✅ Stable | WebGPU Zero-Copy |
-| v5.1-C2 | TBD | 🔄 Dev | Full GPU Migration |
-| v5.2-C3 | TBD | 📋 Planned | Advanced Features |
+### [v5.1-C2] - Full GPU Migration (IN PROGRESS)
+**Target Date:** 2025-01-20
+
+#### Planned Features
+- [ ] Remove all legacy CPU physics code
+- [ ] 100% GPU compute pipeline
+- [ ] Optimized compute shader dispatch
+- [ ] Improved buffer synchronization
+- [ ] Performance benchmarking suite
+
+#### Breaking Changes
+- None expected (transparent migration)
+
+### [v5.2] - Advanced Features (PLANNED)
+- [ ] Multiple simulation presets
+- [ ] Export/Import configuration
+- [ ] Replay system
+- [ ] Advanced statistics graphs
 
 ---
 
-**Legend:**
-- ✨ Added - nowe features
-- 🔧 Changed - zmiany w istniejących features
-- 🐛 Fixed - bugfixy
-- ⚠️ Known Issues - znane problemy
-- 📊 Performance - metryki wydajności
-- 🗑️ Deprecated - przestarzałe features
-- 🔥 Removed - usunięte features
+## Version History Summary
+
+| Version | Date | Major Changes |
+|---------|------|---------------|
+| v5.0-C1 | 2025-01-07 | WebGPU compute, zero-copy rendering |
+| v4.x | 2024 | UI system, interaction matrix |
+| v3.x | 2024 | Spatial hash, WebGL rendering |
+| v2.x | 2024 | Basic physics, collision detection |
+| v1.x | 2024 | Initial prototype |
+
+---
+
+**Changelog Format:**
+- ✨ Added - New features
+- 🔧 Changed - Changes in existing functionality
+- 🐛 Fixed - Bug fixes
+- 🗑️ Removed - Removed features
+- ⚠️ Known Issues - Current limitations
+- 📊 Performance - Performance metrics

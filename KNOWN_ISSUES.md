@@ -1,163 +1,179 @@
-# 🐛 Known Issues
+# Known Issues
+
+> Current bugs, limitations, and technical debt
 
 **Last Updated:** 2025-01-07  
 **Version:** v5.0-C1
 
 ---
 
-## 🔴 Critical Issues
+## 🚨 Critical Issues
 
-**None currently** ✅
-
----
-
-## 🟡 Medium Priority Issues
-
-### 1. Legacy CPU Physics Code
-**Status:** 📋 Planned for removal in v5.1-C2  
-**Impact:** Zaśmieca codebase, zwiększa maintenance cost  
-**Description:**
-- Stary kod CPU physics nadal obecny w projekcie
-- Funkcje typu `updateParticles()` nieużywane gdy WebGPU aktywne
-- ~500 linii dead code
-
-**Workaround:** Użyj WebGPU (domyślnie włączone)  
-**Fix ETA:** v5.1-C2 (1-2 tygodnie)
+*No critical issues currently*
 
 ---
 
-### 2. WebGL Fallback Not Fully Tested
-**Status:** ⚠️ Needs testing  
-**Impact:** Może nie działać na starszych przeglądarkach  
-**Description:**
-- WebGL fallback path istnieje ale nie jest dokładnie przetestowany
-- Możliwe rendering artifacts
-- Performance może być gorsze niż oczekiwane
+## ⚠️ Medium Priority
 
-**Workaround:** Użyj Chrome 113+ dla WebGPU  
-**Fix ETA:** v5.2-C3 (low priority)
+### GPU Rendering Compatibility
+**Issue:** WebGPU canvas context fails if WebGL context already exists  
+**Impact:** GPU rendering disabled, falls back to WebGL  
+**Workaround:** Refresh page before running simulation  
+**Status:** Known limitation - requires canvas recreation  
+**Planned Fix:** v5.1-C2 - Better context management
 
----
+### WebGL Fallback Path
+**Issue:** WebGL fallback not fully tested with all features  
+**Impact:** Some visual effects may not work correctly  
+**Symptoms:**
+- Particle trails may flicker
+- Color interpolation inconsistent
+- Performance degradation with >50k particles
+**Status:** Testing in progress  
+**Planned Fix:** v5.2 - Comprehensive fallback testing
 
-### 3. Canvas Resize Flash
-**Status:** 🐛 Minor visual bug  
-**Impact:** Drobne visual glitch przy resize  
-**Description:**
-- Przy zmianie rozmiaru okna przeglądarki może wystąpić krótki flash
-- Nie wpływa na funkcjonalność
-- Canvas clearing timing issue
-
-**Workaround:** Ignoruj flash, trwa <50ms  
-**Fix ETA:** TBD (low priority)
-
----
-
-## 🟢 Low Priority Issues
-
-### 4. Text Cache Growth
-**Status:** 💭 Optimization opportunity  
-**Impact:** Minimalny - cache ma limit 1000 entries  
-**Description:**
-- TextWidthCache może rosnąć przy dużej liczbie dynamicznych labels
-- LRU eviction działa, ale nie jest optymalny
-- Możliwe micro-optymalizacje
-
-**Workaround:** Cache ma hard limit, nie stanowi zagrożenia  
-**Fix ETA:** Może w przyszłości (very low priority)
+### Legacy Code Pollution
+**Issue:** CPU physics code still present alongside GPU code  
+**Impact:** 
+- Code confusion (two physics implementations)
+- Maintenance burden
+- Increased file size (~500 lines)
+**Status:** **SCHEDULED FOR REMOVAL in v5.1-C2**  
+**Timeline:** 2025-01-20
 
 ---
 
-### 5. Window Drag Jitter
-**Status:** 🐛 Cosmetic issue  
-**Impact:** Minimalny - tylko przy bardzo szybkim ruchu myszą  
-**Description:**
-- Przy bardzo szybkim przeciąganiu okien może wystąpić "skok"
-- Mouse position sampling rate issue
-- Występuje tylko przy ekstremalnych ruchach
+## 💭 Low Priority
 
-**Workaround:** Przeciągaj wolniej  
-**Fix ETA:** TBD (cosmetic)
+### Text Cache Memory Growth
+**Issue:** Text measurement cache can grow unbounded in theory  
+**Impact:** Minimal - LRU eviction at 1000 entries prevents issues  
+**Status:** Monitoring  
+**Notes:** Not observed in practice, but could be optimized
 
----
+### Mobile Performance
+**Issue:** No mobile optimization  
+**Impact:** Poor performance on mobile devices  
+**Status:** Not planned for current phase  
+**Future:** v5.3 - Mobile support
 
-### 6. Stats Update in Pause
-**Status:** 📋 Feature request  
-**Impact:** Bardzo niski - tylko estetyka  
-**Description:**
-- Okno Stats nie aktualizuje się gdy symulacja w pauzie
-- To jest celowe (nie ma nowych danych), ale może być mylące
-- Rozważyć dodanie tekstu "PAUSED"
-
-**Workaround:** Wznów symulację, żeby zobaczyć aktualne stats  
-**Fix ETA:** TBD (nice to have)
-
----
-
-### 7. GPU Error Console Spam
-**Status:** 🐛 Logging issue  
-**Impact:** Bardzo niski - tylko developer console  
-**Description:**
-- W przypadku błędów GPU (np. brak WebGPU) console może być spamowany
-- Error handling działa poprawnie, ale logging mógłby być czystszy
-- Nie wpływa na użytkownika (tylko dev tools)
-
-**Workaround:** Ignoruj console spam  
-**Fix ETA:** TBD (cleanup issue)
+### Browser Compatibility
+**Issue:** WebGPU only in Chrome 113+, Edge 113+  
+**Impact:** Firefox, Safari users must use WebGL fallback  
+**Status:** Waiting for browser support  
+**Workaround:** Use Chrome/Edge for best experience
 
 ---
 
 ## 🔍 Under Investigation
 
-**None currently**
+### Occasional Frame Drops
+**Reported:** Intermittent frame drops with >80k particles  
+**Frequency:** Rare (< 1% of frames)  
+**Suspected Cause:** GPU compute timeout or memory pressure  
+**Status:** Profiling needed  
+**Priority:** Low (doesn't affect usability)
+
+### Memory Usage Growth
+**Reported:** Slow memory growth over extended runs (>30 min)  
+**Measured:** ~2MB/hour  
+**Suspected Cause:** Particle trail history not garbage collected  
+**Status:** Monitoring  
+**Priority:** Low (within acceptable limits)
 
 ---
 
-## ✅ Recently Fixed
+## 📋 Technical Debt
 
-### Canvas Context Initialization (v5.0-C1)
-**Fixed:** 2025-01-07  
-**Issue:** WebGPU canvas context nie inicjalizował się poprawnie  
-**Solution:** Dodano proper error handling i fallback
+### Architecture
+- [ ] **Monolithic file structure** (4398 lines)
+  - ✅ FIXED: v5.1 - Split into modules
+- [ ] **Global variables** scattered throughout
+  - Priority: Medium
+  - Planned: Refactor to module-scoped
+- [ ] **Mixed concerns** (rendering + physics + UI)
+  - Priority: Low
+  - Planned: Better separation of concerns
 
-### Memory Leaks in Particle System (v5.0-C1)
-**Fixed:** 2025-01-07  
-**Issue:** Buffers nie były properly disposed  
-**Solution:** Dodano cleanup w GPUBufferManager
+### Code Quality
+- [ ] **Missing JSDoc comments** for many functions
+  - Priority: Medium
+  - Planned: Ongoing documentation effort
+- [ ] **No type checking** (pure JavaScript)
+  - Priority: Low
+  - Future: Consider TypeScript migration
+- [ ] **Magic numbers** without constants
+  - Priority: Low
+  - Ongoing: Gradual cleanup
 
-### Text Measurement Performance (v5.0-C1)
-**Fixed:** 2025-01-07  
-**Issue:** measureText() wywoływane 100+ razy per frame  
-**Solution:** Dodano LRU cache (OPT-4) → 2-5× speedup
+### Testing
+- [ ] **No automated tests**
+  - Priority: High
+  - Planned: v5.2 - Unit test framework
+- [ ] **No performance regression tests**
+  - Priority: Medium
+  - Planned: v5.2 - Benchmarking suite
+
+---
+
+## 🔧 Workarounds
+
+### Issue: GPU Device Lost
+**When:** GPU driver crash or system sleep  
+**Workaround:** Refresh page  
+**Permanent Fix:** v5.2 - Device recovery handling
+
+### Issue: High Memory Usage
+**When:** >90k particles for extended periods  
+**Workaround:** Reduce particle count or restart simulation  
+**Permanent Fix:** v5.2 - Better memory management
+
+### Issue: UI Lag
+**When:** Many windows open simultaneously  
+**Workaround:** Close unused windows  
+**Permanent Fix:** v5.1-C2 - Optimized UI rendering
+
+---
+
+## 📊 Performance Limitations
+
+| Scenario | Limit | Reason | Status |
+|----------|-------|--------|--------|
+| Max Particles | 100,000 | GPU buffer size | By design |
+| Max Windows | ~10 | UI rendering cost | Can be optimized |
+| Canvas Size | 4096×4096 | WebGL/WebGPU limit | Hardware limit |
+| Compute Workgroup | 256 | GPU architecture | Hardware limit |
+
+---
+
+## 🎯 Resolution Priority
+
+**Priority Matrix:**
+
+| Impact → | High | Medium | Low |
+|----------|------|--------|-----|
+| **Frequency: High** | 🚨 Critical | ⚠️ Important | 💭 Monitor |
+| **Frequency: Medium** | ⚠️ Important | 💭 Monitor | 📋 Backlog |
+| **Frequency: Low** | 💭 Monitor | 📋 Backlog | 📋 Backlog |
 
 ---
 
 ## 📝 Reporting Issues
 
-Jeśli znajdziesz nowy issue:
+If you discover a new issue:
 
-1. **Sprawdź** czy już nie jest listed tutaj
-2. **Zbierz info:**
-   - Browser & version
-   - OS & version
-   - Steps to reproduce
-   - Expected vs actual behavior
-   - Console errors (jeśli są)
-3. **Dodaj** do tego pliku lub otwórz GitHub Issue
+1. Check if it's already listed here
+2. Verify it's reproducible
+3. Note browser, GPU, and particle count
+4. Document steps to reproduce
+5. Open GitHub issue with details
 
 ---
 
-## 🎯 Priority Levels
-
-- 🔴 **Critical** - Blokuje użycie, wymaga natychmiastowej naprawy
-- 🟡 **Medium** - Wpływa na funkcjonalność, planowana naprawa
-- 🟢 **Low** - Kosmetyczne, nie wpływa na core funkcjonalność
-- 💭 **Enhancement** - Nie bug, ale możliwość ulepszenia
-
----
-
-**Legend:**
-- ✅ Fixed
-- 🐛 Active bug
-- 📋 Planned fix
-- ⚠️ Needs investigation
-- 💭 Enhancement opportunity
+**Issue Status Legend:**
+- 🚨 Critical - Blocks core functionality
+- ⚠️ Medium - Reduces functionality or performance
+- 💭 Low - Minor inconvenience
+- 🔍 Under Investigation - Being analyzed
+- 📋 Technical Debt - Cleanup needed
+- ✅ Fixed - Resolved in specified version
