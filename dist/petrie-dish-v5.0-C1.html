@@ -3380,26 +3380,6 @@ fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
         
         // PHYSICS section
         settingsWindow.addSection('physics');
-        settingsWindow.addToggle('Spatial Hash (CPU)', () => settings.useSpatialHash, (v) => {
-            settings.useSpatialHash = v;
-            console.log(v ? '🚀 Spatial Hash: ON (5.5x faster!)' : '🐌 Brute Force: ON (slow)');
-        });
-        settingsWindow.addToggle('GPU Compute (10-100x!)', () => settings.useGPUPhysics, (v) => {
-            if (USE_WEBGPU && gpuPhysicsEngine) {
-                settings.useGPUPhysics = v;
-                console.log(v ? '🚀 GPU Physics: ON (10-100x faster!)' : '🖥️ CPU Physics: ON');
-                
-                // Upload particles to GPU when enabling
-                if (v) {
-                    gpuPhysicsEngine.uploadParticles(activeParticles);
-                    gpuPhysicsEngine.uploadInteractionMatrix(INTERACTION_MATRIX);
-                    console.log('📤 Uploaded particles to GPU');
-                }
-            } else {
-                console.log('⚠️ GPU Physics not available - WebGPU not initialized');
-                alert('GPU Physics requires WebGPU support.\nYour browser may not support it.');
-            }
-        });
         
         settingsWindow.addToggle('GPU Render (Zero-Copy!)', () => settings.useGPURender, (v) => {
             if (USE_WEBGPU && gpuPhysicsEngine && gpuCanvasContext) {
