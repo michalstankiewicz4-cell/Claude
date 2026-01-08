@@ -1,8 +1,9 @@
 # TODO List
 
-## 🔥 Priority 1 - v5.1-C2 (Full GPU Migration)
+## 🔥 Priority 1 - v5.1-C2 (Full GPU Migration) ✅ COMPLETE
 **Target:** 2025-01-20  
-**Status:** Not started
+**Status:** ✅ COMPLETE 2025-01-08  
+**Overall Impact:** ~2× faster performance, -298 lines cleaner code
 
 ### Code Cleanup
 - [x] **Remove legacy CPU physics code** (~150 lines) ✅ DONE 2025-01-07
@@ -20,9 +21,10 @@
   - [x] Test on actual hardware (GPU max: 512)
   - [x] Measure physics time for each configuration
   - [x] Document optimal configuration
+  - [x] Remove benchmark tool after completion
   - Result: 512 is optimal (2x improvement over default 256)
   - Impact: Better GPU utilization, ~40-50% faster physics
-  - Note: 1024+ not supported on test GPU
+  - Cleanup: Removed benchmark UI and function (-146 lines)
 
 - [x] **Improve buffer synchronization** ✅ DONE 2025-01-07
   - [x] Conditional download (only when GPU rendering disabled)
@@ -33,12 +35,13 @@
   - Result: Better framerate, reduced GPU memory bandwidth
 
 ### Testing & Validation
-- [ ] **Create performance benchmarking suite**
+- [ ] **Create performance benchmarking suite** (DEFERRED to v5.3)
   - [ ] Compare CPU vs GPU performance (1k, 10k, 100k particles)
   - [ ] Frame time profiling
   - [ ] Memory usage tracking
   - [ ] Generate performance report
   - Metrics: Physics time, render time, memory, FPS
+  - Note: Deferred to focus on advanced optimizations
 
 ---
 

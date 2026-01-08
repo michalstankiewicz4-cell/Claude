@@ -4,13 +4,13 @@ This directory contains compiled single-file versions of Petrie Dish.
 
 ## Current Version
 
-**v5.1-C2** - `petrie-dish-v5.0-C1.html` (filename unchanged, contains v5.1-C2 code)
+**v5.1-C2** - `petrie-dish-v5.0-C1.html` (filename unchanged, contains v5.1-C2 code) ✅ COMPLETE
 - Advanced GPU Optimizations
 - Workgroup size optimization (256 → 512)
 - Buffer synchronization improvements (-70-80% transfers)
 - Legacy CPU code removed (-152 lines)
-- Automatic workgroup benchmark system
-- **Status:** Current stable release
+- Benchmark cleanup (-146 lines)
+- **Status:** Production ready, stable release
 
 ## File Naming Convention
 

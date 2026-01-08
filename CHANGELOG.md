@@ -5,16 +5,16 @@ All notable changes to Petrie Dish will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v5.1-C2] - 2025-01-08 (IN PROGRESS)
+## [v5.1-C2] - 2025-01-08 ✅ COMPLETE
 
 ### ⚡ Optimized
 - **GPU compute shader workgroup size** (~40-50% faster physics)
-  - Benchmarking system for automatic workgroup size testing
+  - Automatic GPU limits detection and configuration
   - Tests sizes: 64, 128, 256, 512, 1024, 2048
   - Changed default from 256 → 512 (optimal on test hardware)
   - Dynamic shader compilation with configurable WORKGROUP_SIZE
-  - UI button: "⚡ BENCHMARK WORKGROUPS" in Settings
   - Impact: Better GPU utilization, fewer dispatch calls
+  - Note: Benchmark tool removed after optimization complete
 
 - **Buffer synchronization** (~70-80% reduction in CPU↔GPU transfers)
   - Conditional download: Only sync to CPU when GPU rendering disabled
@@ -29,6 +29,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed `applyParticleInteractions()` function (CPU collision detection)
   - Removed `applyForcesBetween()` function (CPU force calculation)
   - Removed `SpatialHash` class (CPU optimization no longer needed)
+  - Removed CPU fallback path in `animate()` loop
+  - Impact: Cleaner codebase, single physics implementation (GPU-only)
+
+- **Benchmark UI and function** (-146 lines)
+  - Removed "⚡ BENCHMARK WORKGROUPS" button from Settings
+  - Removed `benchmarkWorkgroupSizes()` function
+  - Optimal workgroup size (512) now hardcoded
+  - Impact: Cleaner UI, simpler codebase
   - Removed CPU fallback path in `animate()` loop
   - Impact: Cleaner codebase, single physics implementation (GPU-only)
 

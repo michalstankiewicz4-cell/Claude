@@ -15,18 +15,18 @@ Petrie Dish is an advanced particle physics simulator featuring:
 - **16-color interaction matrix** with customizable attraction/repulsion
 - **Real-time UI system** with draggable windows and live statistics
 - **Zero-copy GPU rendering** for optimal performance
-- **Automatic workgroup benchmarking** system
+- **Optimized workgroup size** (512) for maximum GPU utilization
 
 ## 🚀 Current Version
 
-**v5.1-C2 (Phase C2)** - Advanced GPU Optimizations
+**v5.1-C2 (Phase C2)** - Advanced GPU Optimizations ✅ COMPLETE
 - ✅ Legacy CPU physics code removed (-152 lines)
 - ✅ Optimized buffer synchronization (-70-80% CPU↔GPU transfers)
 - ✅ Workgroup size optimization (256 → 512, ~40-50% faster physics)
-- ✅ Automatic benchmark system for GPU configuration
 - ✅ WebGPU-only architecture (no CPU fallback)
 - ✅ Smart dirty flags for parameter updates
-- 📊 Overall performance: ~2× faster than v5.0-C1
+- ✅ Benchmark cleanup (-146 lines)
+- 📊 Overall: ~2× faster, -298 lines cleaner code
 
 ## 📁 Project Structure
 
