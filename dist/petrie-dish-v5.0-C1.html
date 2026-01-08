@@ -139,13 +139,18 @@
                     return false;
                 }
 
-                // Request device
+                // Request device with higher workgroup limits for optimal performance
+                const maxWorkgroupSize = Math.min(
+                    gpuAdapter.limits.maxComputeWorkgroupSizeX,
+                    1024 // Safe maximum for most GPUs
+                );
+                
                 gpuDevice = await gpuAdapter.requestDevice({
                     requiredLimits: {
                         maxStorageBufferBindingSize: gpuAdapter.limits.maxStorageBufferBindingSize,
                         maxBufferSize: gpuAdapter.limits.maxBufferSize,
-                        maxComputeWorkgroupSizeX: 256,
-                        maxComputeInvocationsPerWorkgroup: 256
+                        maxComputeWorkgroupSizeX: maxWorkgroupSize,
+                        maxComputeInvocationsPerWorkgroup: maxWorkgroupSize
                     }
                 });
 
@@ -4423,6 +4428,10 @@ fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
                 gpuPhysicsEngine.uploadParticles(activeParticles);
                 gpuPhysicsEngine.uploadInteractionMatrix(INTERACTION_MATRIX);
                 gpuPhysicsEngine.uploadColorPalette(COLOR_PALETTE);
+                
+                // BUGFIX: Force parameter refresh for initial particles
+                lastSimParams.count = 0;
+                
                 console.log('✅ GPU Physics Engine ready - 10-100x speedup available!');
                 console.log('✅ GPU Rendering ready - Zero-Copy rendering!');
                 
