@@ -43,6 +43,12 @@
 
     <script>
         console.log('✅ Petrie Dish v5.0-C1 - WebGPU Zero-Copy Rendering! 🚀⚡✨');
+        
+        // ═══════════════════════════════════════════════════════════════
+        //   WORKGROUP SIZE CONFIGURATION (for benchmarking)
+        // ═══════════════════════════════════════════════════════════════
+        
+        let WORKGROUP_SIZE = 256; // Default: 256 (can be: 64, 128, 256, 512)
 
         // ═══════════════════════════════════════════════════════════════
         //   ERROR CONSOLE CAPTURE
@@ -420,7 +426,7 @@ struct SimParams {
 @group(0) @binding(5) var<uniform> params: SimParams;
 @group(0) @binding(6) var<storage, read> interactionMatrix: array<f32>;
 
-@compute @workgroup_size(256)
+@compute @workgroup_size(${WORKGROUP_SIZE})
 fn main(@builtin(global_invocation_id) id: vec3u) {
     let i = id.x;
     if (i >= params.particleCount) { return; }
@@ -490,7 +496,7 @@ struct IntegrationParams {
 
 @group(0) @binding(6) var<uniform> params: IntegrationParams;
 
-@compute @workgroup_size(256)
+@compute @workgroup_size(${WORKGROUP_SIZE})
 fn main(@builtin(global_invocation_id) id: vec3u) {
     let i = id.x;
     if (i >= params.particleCount) { return; }
@@ -1016,7 +1022,7 @@ fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
             }
             
             computePhysicsStep(particleCount) {
-                const workgroups = Math.ceil(particleCount / 256);
+                const workgroups = Math.ceil(particleCount / WORKGROUP_SIZE);
                 
                 const encoder = this.device.createCommandEncoder();
                 
@@ -3426,6 +3432,28 @@ fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
             const downloadTime = performance.now() - downloadStart;
         });
         
+        settingsWindow.addButton('⚡ BENCHMARK WORKGROUPS', async () => {
+            if (!USE_WEBGPU || !gpuPhysicsEngine) {
+                alert('GPU not available - cannot benchmark');
+                return;
+            }
+            
+            // Confirm with user
+            const confirmed = confirm(
+                'Workgroup Benchmark\n\n' +
+                'This will test workgroup sizes: 64, 128, 256, 512\n' +
+                'Takes ~20-30 seconds\n\n' +
+                `Current particles: ${activeParticles.length}\n` +
+                `Current workgroup size: ${WORKGROUP_SIZE}\n\n` +
+                'Continue?'
+            );
+            
+            if (!confirmed) return;
+            
+            // Run benchmark
+            await benchmarkWorkgroupSizes();
+        });
+        
         windowManager.add(settingsWindow);
 
         // Test window state (for displaying in statistics)
@@ -4180,6 +4208,114 @@ fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
             }
 
             requestAnimationFrame(animate);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //   WORKGROUP SIZE BENCHMARK
+        // ═══════════════════════════════════════════════════════════════
+        
+        async function benchmarkWorkgroupSizes() {
+            if (!USE_WEBGPU || !gpuPhysicsEngine) {
+                alert('GPU not available - cannot benchmark');
+                return;
+            }
+            
+            console.log('🔬 Starting workgroup size benchmark...');
+            console.log('📊 Testing sizes: 64, 128, 256, 512');
+            console.log('⏱️ Measuring 60 frames per size...');
+            
+            const sizes = [64, 128, 256, 512];
+            const results = [];
+            const testFrames = 60;
+            
+            for (const size of sizes) {
+                console.log(`\n🧪 Testing workgroup size: ${size}`);
+                
+                // Change workgroup size and rebuild pipelines
+                WORKGROUP_SIZE = size;
+                
+                // Reinitialize GPU Physics Engine with new workgroup size
+                try {
+                    const oldEngine = gpuPhysicsEngine;
+                    gpuPhysicsEngine = new GPUPhysicsEngine(gpuDevice, 100000);
+                    await gpuPhysicsEngine.initialize();
+                    gpuPhysicsEngine.uploadParticles(activeParticles);
+                    gpuPhysicsEngine.uploadInteractionMatrix(INTERACTION_MATRIX);
+                    gpuPhysicsEngine.uploadColorPalette(COLOR_PALETTE);
+                    
+                    console.log(`   ✅ Rebuilt pipelines with workgroup_size(${size})`);
+                } catch (error) {
+                    console.error(`   ❌ Failed to rebuild with size ${size}:`, error);
+                    continue;
+                }
+                
+                // Wait for stabilization
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Measure physics time over testFrames
+                const physicsTimes = [];
+                
+                for (let frame = 0; frame < testFrames; frame++) {
+                    const start = performance.now();
+                    
+                    // Run one physics step
+                    const count = activeParticles.length;
+                    const boundaryMode = settings.boundaryMode === 'toroidal' ? 0 : 
+                                       settings.boundaryMode === 'bounce' ? 1 : 2;
+                    
+                    gpuPhysicsEngine.updateSimParams(count, INTERACTION_RANGE, INTERACTION_STRENGTH, WORLD_SIZE, boundaryMode);
+                    gpuPhysicsEngine.updateIntegrationParams(count, VELOCITY_DAMPING, MAX_SPEED, WORLD_MIN, WORLD_MAX, boundaryMode);
+                    gpuPhysicsEngine.computePhysicsStep(count);
+                    
+                    // Wait for GPU to finish
+                    await gpuDevice.queue.onSubmittedWorkDone();
+                    
+                    const end = performance.now();
+                    physicsTimes.push(end - start);
+                    
+                    // Small delay between frames
+                    await new Promise(resolve => setTimeout(resolve, 1));
+                }
+                
+                // Calculate average
+                const avgTime = physicsTimes.reduce((a, b) => a + b, 0) / physicsTimes.length;
+                const minTime = Math.min(...physicsTimes);
+                const maxTime = Math.max(...physicsTimes);
+                
+                results.push({
+                    size,
+                    avgTime,
+                    minTime,
+                    maxTime
+                });
+                
+                console.log(`   ⏱️ Avg: ${avgTime.toFixed(3)}ms | Min: ${minTime.toFixed(3)}ms | Max: ${maxTime.toFixed(3)}ms`);
+            }
+            
+            // Find best result
+            results.sort((a, b) => a.avgTime - b.avgTime);
+            const best = results[0];
+            
+            console.log('\n📊 ===== BENCHMARK RESULTS =====');
+            console.log(`Particle count: ${activeParticles.length}`);
+            console.log('');
+            results.forEach((r, i) => {
+                const marker = i === 0 ? '🏆' : '  ';
+                const speedup = ((results[results.length - 1].avgTime / r.avgTime) * 100 - 100).toFixed(1);
+                console.log(`${marker} Size ${r.size.toString().padStart(3)}: ${r.avgTime.toFixed(3)}ms (${speedup}% faster)`);
+            });
+            console.log('');
+            console.log(`🏆 Winner: workgroup_size(${best.size}) - ${best.avgTime.toFixed(3)}ms average`);
+            
+            // Restore best size
+            WORKGROUP_SIZE = best.size;
+            gpuPhysicsEngine = new GPUPhysicsEngine(gpuDevice, 100000);
+            await gpuPhysicsEngine.initialize();
+            gpuPhysicsEngine.uploadParticles(activeParticles);
+            gpuPhysicsEngine.uploadInteractionMatrix(INTERACTION_MATRIX);
+            gpuPhysicsEngine.uploadColorPalette(COLOR_PALETTE);
+            
+            alert(`Benchmark Complete!\n\n🏆 Best workgroup size: ${best.size}\n⏱️ Average time: ${best.avgTime.toFixed(3)}ms\n\nCheck console for full results.`);
         }
 
         // ═══════════════════════════════════════════════════════════════
